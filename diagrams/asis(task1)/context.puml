@@ -1,0 +1,17 @@
+@startuml
+title Текущая реализация Warmhouse
+top to bottom direction
+
+!include ../c4_templates/C4_Component.puml
+
+Person(user, "Пользователь", "Управляет отоплением и мониторит температуру")
+Person(admin, "Администратор", "Администрирует систему")
+System(WarmhouseSystem, "Система теплый дом", "Система управления отоплением и мониторинг температуры")
+
+System_Ext(sensor, "Датчик", "Непосредственное управление отоплением")
+
+Rel(user, WarmhouseSystem, "Использует систему")
+Rel(admin, WarmhouseSystem, "Администрирует систему")
+Rel(WarmhouseSystem, sensor, "Отправляет запросы")
+
+@enduml

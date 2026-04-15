@@ -1,0 +1,56 @@
+@startuml
+
+title Диаграмма классов
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+
+package "Сервис устройств" <<Rectangle>> {
+    package command {
+        package model.request {
+            class ExecuteCommandRequest
+            class GetDataRequest
+            class OpenDataStreamRequest
+        }
+        package model.response {
+            class ExecuteCommandResponse
+            class GetDataResponse
+            class TelemetryDataResponse
+        }
+        class CommandController
+        class DeviceService
+        class DeviceAdapter
+        class TelemetryService
+
+        model.request --> CommandController : получает запросы
+        model.response --> CommandController : отдает ответы
+
+        CommandController --> DeviceService : использует для обработки запросов
+        DeviceService --> DeviceAdapter : использует для отправки запросов устройствам
+        DeviceAdapter --> TelemetryService : инициирует сбор телеметрии
+    }
+
+    package userdevice {}
+    package devicemodelinfo {
+        class DeviceModelInfoService
+        class DeviceModelInfoRepo
+    }
+
+    DeviceModelInfoService --> DeviceModelInfoRepo : хранит инфо о моделях устройств
+
+    note "пакеты со стандартными CRUD: запросы/ответы, контроллер, сервис и репозиторий" as standard_crud_note
+    standard_crud_note .. userdevice
+    standard_crud_note .. devicemodelinfo
+}
+
+circle Kafka
+circle "Device adapter container"
+
+
+DeviceAdapter --> "Device adapter container" : отправляет запросы на выполнение команд во внешний контейнер с учетом специфики модели устройства
+TelemetryService --> Kafka : отправляет собираемую телеметрию в очереди
+
+DeviceAdapter -left-> DeviceModelInfoService : получает специфичное для определенного устройства инфо
+
+
+@enduml
