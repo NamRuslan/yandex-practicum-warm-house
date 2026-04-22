@@ -8,7 +8,7 @@
 
 Чтобы составить документ с описанием текущей архитектуры приложения, можно часть информации взять из описания компании и условия задания. Это нормально.
 
-</aside
+</aside>
 
 ### 1. Описание функциональности монолитного приложения
 
@@ -54,16 +54,16 @@
 
 Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:	
 
-[Контекст C4 текущего решения](./diagrams/asis(task1)/context.puml)
+[Контекст C4 текущего решения](documentation/diagrams/asis(task1)/context.puml)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
 В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
 
-[Контейнеры](./diagrams/tobe(task2)/containers.puml)  
-[Компоненты](./diagrams/tobe(task2)/components.puml)  
-[Код Сервис Устройств](./diagrams/tobe(task2)/devices_code.puml)  
-[Код Сервис Отопления](./diagrams/tobe(task2)/heating_code.puml)  
+[Контейнеры](documentation/diagrams/tobe(task2)/containers.puml)  
+[Компоненты](documentation/diagrams/tobe(task2)/components.puml)  
+[Код Сервис Устройств](documentation/diagrams/tobe(task2)/devices_code.puml)  
+[Код Сервис Отопления](documentation/diagrams/tobe(task2)/heating_code.puml)  
 
 # Задание 3. Разработка ER-диаграммы
 

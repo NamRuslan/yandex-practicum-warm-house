@@ -1,0 +1,101 @@
+openapi: 3.0.3
+
+info:
+  title: Users API
+  description: API сервиса отопления
+  version: 1.0.0
+
+paths:
+  /heating/params:
+    post:
+      summary: Установить параметры отопления
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceParams'
+      responses:
+        200:
+          description: Установка параметров успешна
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /heating/telemetry/{deviceId}:
+    get:
+      summary: Получить данные устройства отопления на данный момент
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426655440000
+      responses:
+        200:
+          description: Данные устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceParams'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Запрашиваемый ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    DeviceParams:
+      title: Параметры устройства
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          required: true
+          description: Уникальный идентификатор устройства
+          example: 123e4567-e89b-12d3-a456-426655440000
+        power:
+          type: string
+          required: false
+          enum:
+            - on
+            - off
+          description: Включить или выключить устройство
+          example: on
+        temperature:
+          required: false
+          type: integer
+          description: Температура в градусах Цельсия
+          example: 25
+    Error:
+      type: object
+      properties:
+        message: { type: string }

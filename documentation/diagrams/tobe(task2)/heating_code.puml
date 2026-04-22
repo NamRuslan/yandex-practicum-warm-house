@@ -9,13 +9,11 @@ package "Сервис отопления" <<Rectangle>> {
     class HeatingController
 
     package Requests {
-        class SwitchHeatingRequest
-        class SetDeviceStatusRequest
+        class SetDeviceParamsRequest
         class GetHeatingDataRequest
     }
     package Responses {
-        class SwitchHeatingResponse
-        class SetDeviceStatusResponse
+        class SetDeviceParamsResponse
         class GetHeatingDataResponse
     }
     class HeatingService
