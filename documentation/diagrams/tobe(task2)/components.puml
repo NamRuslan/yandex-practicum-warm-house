@@ -2,39 +2,37 @@
 title Диаграмма компонентов
 top to bottom direction
 
+!include ../c4_templates/C4_Container.puml
 !include ../c4_templates/C4_Component.puml
 
-Person(user, "Пользователь", "Управляет отоплением и мониторит температуру")
-Person(admin, "Администратор", "Администрирует систему")
-
 System_Boundary(app, "Приложение Умный дом") {
-    Component(mobileApp, "Мобильное приложение", "Предоставляет пользователю доступ к системе через мобильное приложение")
-    Component(webApp, "Веб сайт", "Предоставляет пользователю доступ к системе через сайт")
-    System_Boundary(backend, "Backend") {
-        Component(apiGw, "API Gateway", "Принимает и маршрутизирует запросы")
-        Component(auth, "Сервис авторизации", "Авторизует пользователей")
-        Component(users, "Сервис пользователей", "Хранит и обрабатывает данные пользователей")
-        Component(devicesService, "Сервис устройств", "Хранит и обрабатывает данные по устройствам. Отправляет запросы устройствам пользователей и собирает телеметрию")
-        Component(userProgramming , "Модуль пользовательского программирования", "Отвечает за пользовательские сценарии использования системы")
-        Component(anyAspectContainer , "Любой сервис устройств", "Хранит и обрабатывает данные по аспектам умного дома (отопление, освещение и т.д.)")
-        ComponentQueue(kafka, "Kafka", "Сбор телеметрии")
+    Container(devicesService, "Сервис устройств", "Хранит и обрабатывает данные по устройствам. Отправляет запросы устройствам пользователей и собирает телеметрию") {
+        Component(commandController, "CommandController", "Контроллер команд. Принимает запросы с командами")
+        Component(deviceService, "DeviceService", "Обработка команд. Слой бизнес-логики обработки запросов с командами")
+        Component(deviceAdapter ,"DeviceAdapter", "Отправка команд. Слой интеграции с устройствами")
+        Component(telemetryService, "TelemetryService", "Обработка телеметрии. Слой бизнес-логики обработки телеметрии")
+        Component(deviceModelInfoRepo, "DeviceModelInfoRepo", "Репозиторий моделей устройств. Слой репозитория для постоянного хранения информации о моделях устройств")
+
+        Rel(commandController, deviceService, "Вызывает бизнес-логику")
+        Rel(deviceService, deviceAdapter, "Вызывает внешнюю интеграцию")
+        Rel(deviceAdapter, telemetryService, "Инициирует сбор телеметрии")
+        Rel(deviceAdapter, deviceModelInfoRepo, "Получает информацию о взаимодействии с моделью устройства")
+    }
+
+    Container(heatingService, "Сервис отопления", "Хранит и обрабатывает данные по отоплению") {
+        Component(heatingController, "HeatingController", "Контроллер отопления. Принимает запросы по отоплению")
+        Component(heatingServiceComponent, "HeatingService", "Слой бизнес-логики. Обрабатывает запросы по отоплению")
+        Component(heatingRepo, "HeatingRepo", "Репозиторий телеметрии отопления. Используется для постоянного хранения данных отопления")
+        Component(telemetryServiceHeating, "TelemetryService", "Сервис телеметрии. Инициирует сбор телеметрии или разового получения данных")
+        Component(deviceAdapterHeating, "DeviceAdapter", "Используется для внешней интеграции с устройствами")
+
+        Rel(heatingController, heatingServiceComponent, "Вызывает бизнес-логику")
+        Rel(heatingServiceComponent, heatingRepo, "Получает данные по отоплению")
+        Rel(heatingServiceComponent, telemetryServiceHeating, "Инициирует сбор телеметрии или запрашивает данные отопления")
+        Rel(telemetryServiceHeating, heatingRepo, "Сохраняет данные телеметрии")
+        Rel(heatingServiceComponent, deviceAdapterHeating, "Отправляет запросы на выполнение команд")
     }
 }
 
-Component_Ext(userDevices, "Устройства пользователей")
 
-Rel(user, mobileApp, "Отправляет запросы на управление устройствами через мобильное приложение")
-Rel(user, webApp, "Регистрируется, подключает устройства и отправляет запросы на управление устройствами через сайт.")
-Rel(admin, webApp, "Администрирует систему, добавляет новые модели устройств, занимается обращениями пользователей")
-Rel(mobileApp, apiGw, "Отправляет запросы")
-Rel(webApp, apiGw, "Отправляет запросы")
-Rel_L(apiGw, auth, "Вход пользователя и его авторизация")
-Rel_R(apiGw, users, "Регистрация пользователей, регистрация домов пользователей, ведение их профилей")
-Rel(apiGw, anyAspectContainer, "Направляет пользовательские запросы на выполнение команд для устройств и получение телеметрии для любого сервиса аспекта устройств")
-Rel(apiGw, userProgramming, "Работает с пользовательскими сценариями работы с устройствами")
-Rel_R(apiGw, devicesService, "Направляет запросы на добавление новых моделей, регистрацию пользовательских устройств.")
-Rel(anyAspectContainer, devicesService, "Запросы на выполнение команд и сбор телеметрии")
-Rel(devicesService, userDevices, "Отправляет запросы непосредственно устройствам пользователей на выполнение команд и сбор телеметрии")
-Rel_R(devicesService, kafka, "Отправляет телеметрию в очереди")
-Rel(anyAspectContainer, kafka, "Получает телеметрию для последующего хранения")
 @enduml
