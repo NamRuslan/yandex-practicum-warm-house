@@ -1,0 +1,41 @@
+@startuml
+
+title Диаграмма классов
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+
+package "Сервис отопления" <<Rectangle>> {
+    class HeatingController
+
+    package Requests {
+        class SetDeviceParamsRequest
+        class GetHeatingDataRequest
+    }
+    package Responses {
+        class SetDeviceParamsResponse
+        class GetHeatingDataResponse
+    }
+    class HeatingService
+    class HeatingRepo
+
+    class TelemetryService
+
+    class DeviceAdapter
+}
+
+circle Kafka
+circle "Device adapter container"
+
+Requests --> HeatingController : запросы поступают в контроллер
+Responses --> HeatingController : контроллер отдает ответы
+
+HeatingController --> HeatingService : использует для обработки запросов
+HeatingService --> HeatingRepo : хранит и запрашивает данные
+HeatingService --> TelemetryService : использует чтобы инициировать сбор телеметрии или единоразово получить текущие данные
+TelemetryService -left-> HeatingRepo : сохраняет собранную телеметрию
+HeatingService --> DeviceAdapter : отправляет запросы на выполнение команд
+DeviceAdapter --> "Device adapter container" : отправляет запросы на выполнение команд во внешний контейнер
+TelemetryService --> Kafka : получает из очередей телеметрию
+
+@enduml

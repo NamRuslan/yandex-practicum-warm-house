@@ -1,0 +1,108 @@
+openapi: 3.0.3
+
+info:
+  title: Users API
+  description: API сервиса устройств
+  version: 1.0.0
+
+paths:
+  /devices/execute:
+    post:
+      summary: Выполнить команду для устройства
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteCommandRequest'
+      responses:
+        200:
+          description: Команда выполнена успешно
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /devices/{deviceId}/data:
+    get:
+      summary: Получить телеметрические данные устройства
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426655440000
+      responses:
+        200:
+          description: Данные получены успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Запрашиваемый ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    ExecuteCommandRequest:
+      title: Данные команды для выполнения
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          required: true
+          description: Уникальный идентификатор устройства
+          example: 123e4567-e89b-12d3-a456-426655440000
+        command:
+          type: string
+          required: true
+          description: Наименование команды для выполнения
+          example: set_temperature
+        args:
+          type: array
+          additionalProperties: true
+    GetDataResponse:
+      title: Телеметрические данные устройства
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          required: true
+          description: Уникальный идентификатор устройства
+          example: 123e4567-e89b-12d3-a456-426655440000
+        params:
+          type: array
+          additionalProperties: true
+    Error:
+      type: object
+      properties:
+        message: { type: string }

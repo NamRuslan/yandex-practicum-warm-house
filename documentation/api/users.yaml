@@ -1,0 +1,216 @@
+openapi: 3.0.3
+
+info:
+  title: Users API
+  description: API сервиса пользователей
+  version: 1.0.0
+
+paths:
+  /users:
+    post:
+      summary: Добавить нового пользователя
+      requestBody:
+        required: true
+        description: Данные создаваемого пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        200:
+          description: Успешное создание пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426655440000
+                  message:
+                    type: string
+                    example: Создание пользователя выполнено успешно
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{userId}:
+    patch:
+      summary: Обновить данные пользователя по UUID
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        description: Обновляемые данные пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        200:
+          description: Успешное обновление пользователя
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Удалить пользователя по UUID
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        200:
+          description: Успешное удаление пользователя
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      summary: Получить данные пользователя по UUID
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        200:
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  responses:
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Запрашиваемый ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+
+  schemas:
+    UserDataResponse:
+      title: Ответ с данными пользователя
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор пользователя
+          example: 123e4567-e89b-12d3-a456-426655440000
+        firstName:
+          type: string
+          description: Имя пользователя
+          example: Иван
+        middleName:
+          type: string
+          description: Отчество пользователя
+          example: Иванович
+        lastName:
+          type: string
+          description: Фамилия пользователя
+          example: Иванов
+        phoneNumber:
+          type: string
+          description: Номер телефона
+          example: 8-800-555-35-35
+        email:
+          type: string
+          description: Email
+          example: email@email.com
+    CreateUserRequest:
+      title: Запрос на создание пользователя
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Имя пользователя
+          example: Иван
+          required: true
+        middleName:
+          type: string
+          description: Отчество пользователя
+          example: Иванович
+          required: true
+        lastName:
+          type: string
+          description: Фамилия пользователя
+          example: Иванов
+          required: true
+        phoneNumber:
+          type: string
+          description: Номер телефона
+          example: 8-800-555-35-35
+          required: true
+        email:
+          type: string
+          description: Email
+          example: email@email.com
+          required: true
+    UpdateUserRequest:
+      title: Запрос на обновление пользователя
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Имя пользователя
+          example: Иван
+          required: false
+        middleName:
+          type: string
+          description: Отчество пользователя
+          example: Иванович
+          required: false
+        lastName:
+          type: string
+          description: Фамилия пользователя
+          example: Иванов
+          required: false
+        phoneNumber:
+          type: string
+          description: Номер телефона
+          example: 8-800-555-35-35
+          required: false
+        email:
+          type: string
+          description: Email
+          example: email@email.com
+          required: false
+    Error:
+      type: object
+      properties:
+        message: { type: string }
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426655440000

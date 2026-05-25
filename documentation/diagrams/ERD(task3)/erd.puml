@@ -1,0 +1,72 @@
+@startuml
+
+title Диаграмма сущностей сервиса пользователей
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+
+package "Сервис пользователей" <<Rectangle>> {
+    entity User {
+        UUID id
+        String firstName
+        String middleName
+        String lastName
+        String phoneNumber
+        String email
+    }
+
+    entity House {
+        UUID id
+        UUID userId
+        String address
+    }
+
+    User "1"--"N" House
+}
+
+package "Сервис устройств" <<Rectangle>> {
+    entity DeviceModelInfo {
+        UUID id
+        String modelName
+        String description
+        UUID deviceTypeId
+        List<DeviceProtocol> deviceProtocols
+    }
+
+    entity DeviceType {
+        UUID id
+        String name
+        String description
+    }
+
+    enum DeviceProtocol {
+        MQTT
+        ZIGBEE
+        Z_WAVE
+        REST_API
+    }
+
+    entity UserDevice {
+        UUID id
+        UUID houseId
+        UUID deviceModelId
+        String serialNumber
+        boolean isTurnedOn
+    }
+
+    DeviceModelInfo "1" -- "1" DeviceType
+    DeviceModelInfo "1" -- "N" UserDevice
+    UserDevice "N" -- "1" House
+}
+
+package "Сервис отопления" <<Rectangle>> {
+    entity HeatingTelemetry {
+        UUID userDeviceId
+        Timestamp timestamp
+        int temperature
+    }
+
+    HeatingTelemetry "N" -- "1" UserDevice
+}
+
+@enduml

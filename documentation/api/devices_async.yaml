@@ -1,0 +1,53 @@
+asyncapi: 2.3.0
+
+info:
+  version: 1.0.0
+  title: Асинхронный API сервиса устройств
+
+defaultContentType: application/json
+
+channels:
+  /devices/data-stream:
+    description: Websocket канал для получения потока телеметрии устройства
+    publish:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/GetDeviceTelemetry'
+    subscribe:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/TelemetryData'
+
+components:
+  messages:
+    TelemetryData:
+      description: Телеметрические данные устройства
+      payload:
+        $ref: '#/components/schemas/TelemetryData'
+      examples:
+        - payload:
+            temperature: 25
+    GetDeviceTelemetry:
+      description: Запрос на подписку на телеметрию устройства
+      payload:
+        $ref: '#/components/schemas/GetDeviceTelemetry'
+      examples:
+        - payload:
+            deviceId: 123e4567-e89b-12d3-a456-426655440000
+  schemas:
+    TelemetryData:
+      type: object
+      properties:
+        params:
+          type: array
+          additionalProperties: true
+          examples:
+            - temperature: 25
+    GetDeviceTelemetry:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          examples:
+            - 123e4567-e89b-12d3-a456-426655440000

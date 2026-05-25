@@ -1,0 +1,38 @@
+@startuml
+title Диаграмма компонентов
+top to bottom direction
+
+!include ../c4_templates/C4_Container.puml
+!include ../c4_templates/C4_Component.puml
+
+System_Boundary(app, "Приложение Умный дом") {
+    Container(devicesService, "Сервис устройств", "Хранит и обрабатывает данные по устройствам. Отправляет запросы устройствам пользователей и собирает телеметрию") {
+        Component(commandController, "CommandController", "Контроллер команд. Принимает запросы с командами")
+        Component(deviceService, "DeviceService", "Обработка команд. Слой бизнес-логики обработки запросов с командами")
+        Component(deviceAdapter ,"DeviceAdapter", "Отправка команд. Слой интеграции с устройствами")
+        Component(telemetryService, "TelemetryService", "Обработка телеметрии. Слой бизнес-логики обработки телеметрии")
+        Component(deviceModelInfoRepo, "DeviceModelInfoRepo", "Репозиторий моделей устройств. Слой репозитория для постоянного хранения информации о моделях устройств")
+
+        Rel(commandController, deviceService, "Вызывает бизнес-логику")
+        Rel(deviceService, deviceAdapter, "Вызывает внешнюю интеграцию")
+        Rel(deviceAdapter, telemetryService, "Инициирует сбор телеметрии")
+        Rel(deviceAdapter, deviceModelInfoRepo, "Получает информацию о взаимодействии с моделью устройства")
+    }
+
+    Container(heatingService, "Сервис отопления", "Хранит и обрабатывает данные по отоплению") {
+        Component(heatingController, "HeatingController", "Контроллер отопления. Принимает запросы по отоплению")
+        Component(heatingServiceComponent, "HeatingService", "Слой бизнес-логики. Обрабатывает запросы по отоплению")
+        Component(heatingRepo, "HeatingRepo", "Репозиторий телеметрии отопления. Используется для постоянного хранения данных отопления")
+        Component(telemetryServiceHeating, "TelemetryService", "Сервис телеметрии. Инициирует сбор телеметрии или разового получения данных")
+        Component(deviceAdapterHeating, "DeviceAdapter", "Используется для внешней интеграции с устройствами")
+
+        Rel(heatingController, heatingServiceComponent, "Вызывает бизнес-логику")
+        Rel(heatingServiceComponent, heatingRepo, "Получает данные по отоплению")
+        Rel(heatingServiceComponent, telemetryServiceHeating, "Инициирует сбор телеметрии или запрашивает данные отопления")
+        Rel(telemetryServiceHeating, heatingRepo, "Сохраняет данные телеметрии")
+        Rel(heatingServiceComponent, deviceAdapterHeating, "Отправляет запросы на выполнение команд")
+    }
+}
+
+
+@enduml
